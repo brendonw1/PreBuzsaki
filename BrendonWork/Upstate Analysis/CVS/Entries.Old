@@ -1,0 +1,55 @@
+/Add750mswddelaytoPaper1UPs.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/ReviewUpstatesInTrace.m/1.5/Wed Dec 14 03:29:03 2005//
+/VmFrames.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/allapsbyin6wd750.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/analyzeupstates.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/avgmembranefromfile.m/1.5/Mon Mar 27 18:29:25 2006//
+/avgmembranepotentials.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/byfiletobycell.m/1.2/Sat May  7 23:22:09 2005//
+/combineuptraces.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/comparebycells.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/comparebycellsdiff.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/countaps.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/decimatebymaxmin.m/1.1/Wed Mar  9 00:59:44 2005//
+/decimatebymean.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/displaymembranefromfiles.m/1.2/Thu Jun  2 01:52:28 2005//
+/elimaps.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/evalwhich.m/1.2/Wed Jun  1 05:35:16 2005//
+/findallupstates.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/findbase.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/findfirstlast.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/findupstates.m/1.4/Wed Jun 14 00:01:03 2006//
+/fixupstates.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/kramersanalysis.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/oldfindin6.m/1.1/Wed Jun  1 05:35:16 2005//
+/pairwisecompareups.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/plottingallaps.m/1.1.1.1/Tue Mar  1 18:12:00 2005//
+/quantifyeachcell.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/quantifyupstates.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/quantifyuptraces.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/readnotesabf.m/1.3/Wed Jun  1 05:35:16 2005//
+/relativetiming.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/reviewupstates.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/saveupstatetraces.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforaddingcore.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforaddingin6.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforclassifyingdirectinput.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforcomparingcoreandnoncoreups.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforgettingnonupstatenotes.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+/scriptforplottingallaps.m/1.2/Mon Jun  6 05:13:14 2005//
+/separatetrains.m/1.2/Sun Mar 26 21:50:14 2006//
+/totalcells.m/1.1.1.1/Tue Mar  1 18:12:01 2005//
+D/Metric Analysis////
+D/WDstim Analysis////
+/continuousabove.m/1.5/Tue Feb  6 03:06:37 2007//
+/overlapping.m/1.2/Tue Jun 19 01:52:00 2007//
+D/Conductance Analysis////
+D/PSP Analysis////
+/findin6.m/1.3/Thu Jul 19 11:45:54 2007//
+/findin62.m/1.2/Thu Jul 19 03:00:13 2007//
+/separatein6.m/1.7/Thu Jul 19 11:45:54 2007//
+/continuousbelow.m/1.3/Fri Nov  9 21:39:14 2007//
+/channelmatch.m/1.2/Thu Mar 13 03:16:02 2008//
+/channelnames.m/1.2/Thu Mar 13 03:16:02 2008//
+/findaps.m/1.2/Result of merge+Thu Mar 13 03:16:02 2008//
+/findaps2.m/1.6/Thu Mar 13 03:16:02 2008//

@@ -1,0 +1,56 @@
+function picked=cellpicker(varargin);
+%INPUT AT START SHOULD BE AN ARRAY OF CELL CONTOURS and SPECIFIED NUMBERS.
+
+
+if nargin==1;
+    mode='draw';
+    contours=varargin{1};
+    prepicked=[];
+elseif nargin==2;
+    if isstruct(varargin{2})
+        mode='pick';
+    else
+        mode='draw';
+        contours=varargin{1};
+        prepicked=varargin{2};
+    end    
+end
+
+switch mode
+    case 'draw'
+		handles.fig=figure('Name','Cell Picker','NumberTitle','off','MenuBar','none','doublebuffer','on');
+		hObject = handles.fig;
+		hold on;
+		axis off;
+        axis equal
+        axis tight;
+        set(gca,'YDir','reverse')
+		for x=1:length(contours);
+            handles.cells{x}=patch(contours{x}(:,1),contours{x}(:,2),'k','FaceColor','none');%plot a black patch for each contour
+            set(handles.cells{x},'tag',num2str(x),'buttondownfcn','cellpicker(gcbo,guidata(gcbo))');%sets value in oncells to 1 when contour is clicked
+		end
+        handles.ons=zeros(1,length(contours));
+        handles.ons(prepicked)=1;
+        for a=1:length(handles.ons);%for each contour    
+            if handles.ons(a)==1;%if a one is there
+                set(handles.cells{a},'FaceColor','r');%color it red
+            end
+        end
+%         handles.outname=outputname;
+        picked=prepicked;
+        guidata(hObject,handles);
+    case 'pick'
+        handles=varargin{2};
+   		hObject = handles.fig;
+        h=varargin{1};
+		t=str2num(get(h,'tag'));
+        handles.ons(t)=~handles.ons(t);
+     	if handles.ons(t)==1;
+            set(h,'FaceColor','r');
+		elseif handles.ons(t)==0;
+            set(h,'FaceColor','none');
+		end
+%         picked=find(handles.ons);      
+        assignin('base','picked',find(handles.ons));
+        guidata(hObject,handles);
+end

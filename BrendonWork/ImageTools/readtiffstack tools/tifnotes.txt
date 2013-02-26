@@ -1,0 +1,102 @@
+CREATED BY FLUOVIEW/GENERAL... READ IN ONE FRAME AT A TIME
+
+%could generalize bitdepth and matrix precision (8 vs 16 etc)
+i=imfinfo(moviename);%get basic info about the movie... including size of frames and number of frames
+stacksize=size(i,2);
+height=i(1).Height;
+width=i(1).Width;
+bitdepth=i(1).BitsPerSample;
+if strcmp(i(1).ByteOrder,'little-endian');
+	readspec='ieee-le';
+elseif strcmp(i(1).ByteOrder,'big-endian');
+	readspec='ieee-be';
+end
+pixels=uint16(zeros(1));
+pixels=repmat(pixels,[height,width,size(i,2)]);%establishing a blank matrix of the size necessary to hold the entire movie... this saves time
+[fid,message]=fopen(moviename,'rb',readspec);
+for a=1:stacksize;
+    fseek(fid,i(a).StripOffsets(1),'bof');
+    [im,count]=fread(fid,[width height],'*uint16');
+    pixels(:,:,a)=im';
+end
+
+
+CREATED BY FLUOVIEW/GENERAL... READ IN AT ONCE, THEN BREAK INTO FRAMES
+!!!PROBLEM... STRIPOFFSETS ARE IN BYTES, NOW IN 16BIT BYTES.  WON'T WORK IF A FRAME STARTS AT AN ODD NUMBERED BYTE (THOUGH ALL SO FAR CHECKED ARE ACTUALLY EVEN)
+
+i=imfinfo(moviename);%get basic info about the movie... including size of frames and number of frames
+stacksize=size(i,2);
+height=i(1).Height;
+width=i(1).Width;
+bitdepth=i(1).BitsPerSample;
+if strcmp(i(1).ByteOrder,'little-endian');
+	readspec='ieee-le';
+elseif strcmp(i(1).ByteOrder,'big-endian');
+	readspec='ieee-be';
+end
+pixels=uint16(zeros(1));
+pixels=repmat(pixels,[height,width,size(i,2)]);%establishing a blank matrix of the size necessary to hold the entire movie... this saves time
+[fid,message]=fopen(moviename,'rb',readspec);
+[im,count]=fread(fid,'*uint16');
+for a=1:stacksize;
+    start=(i(a).StripOffsets(1)*8/bitdepth);%THIS IS THE POTENTIAL TROUBLE SPOT
+    frame=im(start:(start+(height*width)-1));
+    frame=reshape(frame,[width height]);
+    pixels(:,:,a)=frame';
+end
+
+
+CREATED BY FLUOVIEW/GENERAL... READ IN ONE FRAME AT A TIME
+
+i=imfinfo(moviename);%get basic info about the movie... including size of frames and number of frames
+stacksize=size(i,2);
+height=i(1).Height;
+width=i(1).Width;
+bitdepth=i(1).BitsPerSample;
+pixels=uint16(zeros(1));
+pixels=repmat(pixels,[height,width,size(i,2)]);%establishing a blank matrix of the size necessary to hold the entire movie... this saves time
+[fid,message]=fopen(moviename,'rb','ieee-le');
+for a=1:stacksize;
+    fseek(fid,i(a).StripOffsets(1),'bof');
+    [im,count]=fread(fid,[width height],'*uint16');
+    pixels(:,:,a)=im';
+end
+
+
+
+CREATED BY IMAGE J
+
+i=imfinfo(moviename);%get basic info about the movie... including size of frames and number of frames
+stacksize=size(i,2);
+height=i(1).Height;
+width=i(1).Width;
+bitdepth=i(1).BitsPerSample;
+
+if stacksize==1;
+    header=i(1).StripOffsets;
+    footer=i(1).FileSize-header-bitdepth/8*(stacksize*(height*width));
+    [fid,message]=fopen(moviename,'rb','ieee-be');
+    fseek(fid,header,'bof');
+   	[pixels,count]=fread(fid,[width height],'*uint16');
+    pixels=pixels';
+elseif stacksize>1;
+    frameheader=(i(2).StripOffsets(1)-i(1).StripOffsets(1))*8/bitdepth-(height*width);
+    fileheader=i(1).StripOffsets-frameheader;
+    footer=i(1).FileSize-fileheader-bitdepth/8*(stacksize*(frameheader+height*width));
+    if frameheader==0;
+        [fid,message]=fopen(moviename,'rb','ieee-be');
+        fseek(fid,fileheader,'bof');
+       	[pixels,count]=fread(fid,[width*height*stacksize 1],'*uint16');
+        pixels=reshape(pixels,[width height stacksize]);
+        pixels=ipermute(pixels,[2 1 3]);
+    else%if each frame has a header... may never happen...
+	pixels=uint16(zeros(1));
+	pixels=repmat(pixels,[height,width,size(i,2)]);%establishing a blank matrix of the size necessary to hold the entire movie... this saves time
+        [fid,message]=fopen(moviename,'rb','ieee-be');
+        fseek(fid,fileheader,'bof');
+        for a=1:stacksize;
+	        [im,count]=fread(fid,[width height],'*uint16');
+	        pixels(:,:,a)=im';
+        end
+    end
+end

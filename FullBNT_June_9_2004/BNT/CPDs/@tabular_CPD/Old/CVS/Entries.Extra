@@ -1,0 +1,10 @@
+/BIC_score_CPD.m////*///
+/bayesian_score_CPD.m////*///
+/log_marg_prob_node_case.m////*///
+/mult_CPD_and_pi_msgs.m////*///
+/prob_CPT.m////*///
+/prob_node.m////*///
+/sample_node.m////*///
+/sample_node_single_case.m////*///
+/tabular_CPD.m////*///
+/update_params.m////*///

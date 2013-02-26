@@ -1,0 +1,11 @@
+/README////*///
+/combine_pots.m////*///
+/complement_pot.m////*///
+/direct_combine_pots.m////*///
+/extension_pot.m////*///
+/marginalize_pot.m////*///
+/normalize_pot.m////*///
+/pot_to_marginal.m////*///
+/recursive_combine_pots.m////*///
+/reduce_pot.m////*///
+/scgpot.m////*///

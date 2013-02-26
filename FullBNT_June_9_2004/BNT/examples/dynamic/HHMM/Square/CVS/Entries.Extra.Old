@@ -1,0 +1,13 @@
+/get_square_data.m////*///
+/hhmm_inference.m////*///
+/is_F2_true_D3.m////*///
+/learn_square_hhmm_cts.m////*///
+/learn_square_hhmm_discrete.m////*///
+/mk_square_hhmm.m////*///
+/plot_square_hhmm.m////*///
+/sample_square_hhmm_cts.m////*///
+/sample_square_hhmm_discrete.m////*///
+/square4.mat////*///
+/square4_cases.mat////*///
+/test_square_fig.m////*///
+/test_square_fig.mat////*///

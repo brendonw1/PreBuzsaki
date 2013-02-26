@@ -1,0 +1,9 @@
+/approxeq_pot.m////*///
+/display.m////*///
+/divide_by_pot.m////*///
+/marginalize_pot.m////*///
+/multiply_by_pot.m////*///
+/normalize_pot.m////*///
+/pot_to_marginal.m////*///
+/upot.m////*///
+/upot_to_opt_policy.m////*///

@@ -1,0 +1,17 @@
+/AR_to_SS.m////*///
+/README.txt////*///
+/SS_to_AR.m////*///
+/convert_to_lagged_form.m////*///
+/ensure_AR.m////*///
+/eval_AR_perf.m////*///
+/kalman_filter.m////*///
+/kalman_forward_backward.m////*///
+/kalman_smoother.m////*///
+/kalman_update.m////*///
+/learn_AR.m////*///
+/learn_AR_diagonal.m////*///
+/learn_kalman.m////*///
+/learning_demo.m////*///
+/sample_lds.m////*///
+/smooth_update.m////*///
+/tracking_demo.m////*///

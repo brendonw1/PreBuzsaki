@@ -1,0 +1,1 @@
+function temp=imagefrommasks(masks,imagesize);temp=zeros(imagesize);for a=1:length(masks);    temp(masks{a})=1;end% figure;% imagesc(temp);% colormap gray;

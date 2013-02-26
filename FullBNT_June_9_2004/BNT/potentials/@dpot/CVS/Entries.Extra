@@ -1,0 +1,14 @@
+/approxeq_pot.m////*///
+/display.m////*///
+/divide_by_pot.m////*///
+/domain_pot.m////*///
+/dpot.m////*///
+/dpot_to_table.m////*///
+/find_most_prob_entry.m////*///
+/get_fields.m////*///
+/marginalize_pot.m////*///
+/multiply_by_pot.m////*///
+/multiply_pots.m////*///
+/normalize_pot.m////*///
+/pot_to_marginal.m////*///
+/set_domain_pot.m////*///

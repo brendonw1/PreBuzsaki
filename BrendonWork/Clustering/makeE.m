@@ -1,0 +1,36 @@
+function  [G,E]=makeE(region,filename,framerate);
+
+% masks=contourstomasks(region.contours,region.imagesize);
+% img=imagefrommasks(masks,region.imagesize);
+% img2=img>0;%threshold the image
+% img2=imopen(img2,strel('disk',1));%keep only object that are at least as large as a disk of diameter 5
+%     %imopen = imerode then imdilate
+% img2=bwlabel(img2,8);%label each independent object with a number
+% E.realNeurons=imfeature(img2,'Area','Centroid','BoundingBox','PixelList');
+
+for a=1:size(region.contours,2);
+    E.realNeurons(a).Centroid=centroid(region.contours{a});
+    x(a,:)=centroid(region.contours{a});
+end
+
+tr=file2trace(filename);
+tr=diff(tr,1,2);%take df/fp
+for a=1:size(tr,1);
+    tr(a,:)=normalize(tr(a,:));%normalize each trace so it is 1 at max, 0 min
+end
+tr=tr-repmat(mean(tr),size(tr,1),1);%subtract out any events happening across the entire slice (this may remove some signal)
+for a=1:size(tr,1);
+    tr(a,:)=normalize(tr(a,:));%normalize each trace so it is 1 at max, 0 min
+end
+
+for a=1:size(tr,1);
+	for b=1:size(tr,2);
+		E.realNeurons(a).intensityclean(b)=tr(a,b);
+	end
+    E.realNeurons(a).id=a;
+end
+E.numRealNeurons=size(tr,1);
+
+G.numImagesProcess=size(tr,2);
+G.fs=1/framerate;
+G.name='name_of_movie';

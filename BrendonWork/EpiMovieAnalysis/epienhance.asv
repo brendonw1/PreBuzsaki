@@ -1,0 +1,20 @@
+function enh=epienhance(image);
+%Enhances images taken under 40X objective from Jason MacLean's setup
+%(256x256) cCCD from Princeton Instruments, EPIFLUORESCENT enhancement with
+%.5X magnifier.  
+%First, images are analyzed two ways: to select for bright centers using a
+%LaPlacian (del2) and then to select for edges using gradientmag.  These
+%two images are then median filtered, normalized to between 0 and 1 and
+%then added together for a final enhanced image.
+
+
+mag=gradientmag(image);%enhance edges
+lap=-del2(image);%enhance middles of cells
+
+lap=medfilt2(lap,[5 5]);%median filter both enhanced images, according to the size of a cell (5 pixels wide)
+mag=medfilt2(mag,[5 5]);%use 3 instead of 5 for 20X movie
+
+lap=normalize(lap);%set image max to 1
+mag=normalize(mag);
+
+enh=map+lap;

@@ -1,0 +1,34 @@
+function sorted=findecho(sorted)
+%this functions will look for a echos, where in a single movie a network calcium event recurrs spontaneously.  
+
+names={['tstrain'] ['tssingle'] ['spont'] ['wdsingle'] ['wdtrain']};
+for a=1:size(sorted,2);%for each slice
+    for n=1:length(names);
+        name=names{n};
+        eval(['s=size(sorted{a}.',name,',2);']);
+        for b=1:s;
+            eval(['frameons=sum(sorted{a}.',name,'(b).ons,2);']);%find how many cells in each frame of each movie
+            above5=continuousabove(frameons,zeros(size(frameons)),4,1,10);
+            if size(above5,1)>1;
+                figure
+                eval(['m=min([size(sorted{a}.',name,'(b).ons,1) 20]);']);
+                disp(name)
+                for c=1:m;
+                    subplot(4,5,c);
+                    eval(['highlightons(sorted{a}.contours,sorted{a}.',name,'(b).ons(c,:));'])
+                    title(['Frame ',num2str(c)]);
+                end
+                r=input('Where was the echo? ');%input should be frame numbers in a vector
+				ends=find(diff(r)>1);
+				starts=ends+1;
+				starts(end+1)=1;
+				starts=sort(starts);
+				ends(end+1)=length(r);
+				eval(['sorted{a}.',name,'(b).echo={};']);
+				for d=1:length(starts)
+                    eval(['sorted{a}.',name,'(b).echo{d}=r(starts(d):ends(d));'])
+				end                
+            end
+        end
+    end
+end

@@ -1,0 +1,1 @@
+function index = findslice(matnotes,name);index = [];for a = 1:length(matnotes);    temp = strmatch(name,matnotes(a).name);    if ~isempty(temp);        index(end+1) = a;    endend

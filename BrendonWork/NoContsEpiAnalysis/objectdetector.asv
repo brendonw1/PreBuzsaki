@@ -1,0 +1,38 @@
+function masks=objectdetector(img,thresh,streltype,strelsize,minobj,maxobj);
+%Input is an image, which will be thresholded and all objects fitting a
+%minimum sized object will be detected.  The object type is specified by
+%"streltype" and the size is specified by strelsize (see "strel" help 
+%function).  After detection of such objects, they are passed through
+%another size filter, each object must be larger than "minobj" and smaller
+%than "maxobj".  Output is "masks", a cell array of vectors... each vector
+%is a list of pixel numbers representing each objects.
+
+
+img2=img>thresh;%threshold the image
+img2=imopen(img2,strel(streltype,strelsize));%keep only object that are at least as large as a disk of diameter 5
+    %imopen = imerode then imdilate
+img2=bwlabel(img2,8);%label each independent object with a number
+img2=imfeature(img2,'PixelList');%extract the x & y coordinates of each pixel in the object
+        
+masks={};%Establish a matrix to store a list of pixels for each cell
+for a=1:length(img2);%for each object for which info is stored in the structure img 
+    if length(img2(a).PixelList)<maxobj & length(img2(a).PixelList)>minobj;%if the object at hand is between the max and min acceptable area sizes
+        tempor=img2(a).PixelList;%store x & y pixel coordinates for easier use
+        numb=[];%establish/clear new version of this variable for each pass
+        for b=1:size(tempor,1);%for each pixel in the object at hand
+            numb(b)=size(img,1)*(tempor(b,1)-1)+tempor(b,2);%find an absolute pixel number in the image (ie not x and y) and save it
+        end
+        masks(end+1)={numb};%save a vector (list) of pixel numbers for each object in one compartment of a cell array
+    end
+end
+
+temp=zeros(size(img));
+for a=1:length(masks);
+    temp(masks{a})=1;
+end
+figure;
+set(gcf,'position',[360   155   560   779]);
+subplot (2,1,1);
+imagesc(img);
+subplot (2,1,2);
+imagesc(temp);

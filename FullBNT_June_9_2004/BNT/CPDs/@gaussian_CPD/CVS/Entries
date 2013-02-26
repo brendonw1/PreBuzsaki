@@ -1,0 +1,20 @@
+/CPD_to_lambda_msg.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/CPD_to_pi.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/CPD_to_scgpot.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/adjustable_CPD.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/convert_CPD_to_table_hidden_ps.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/convert_to_pot.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/convert_to_table.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/display.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/gaussian_CPD.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/gaussian_CPD_params_given_dps.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/get_field.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/learn_params.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/log_prob_node.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/maximize_params.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/maximize_params_debug.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/reset_ess.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/sample_node.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/set_fields.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+/update_ess.m/1.1.1.1/Wed Dec 15 15:05:36 2004//
+D

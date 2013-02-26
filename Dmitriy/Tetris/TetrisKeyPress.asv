@@ -1,0 +1,84 @@
+if kp == 28 | kp == 29
+    isbad = 0;
+    for c = 1:length(h)
+        miny = min(get(h(c),'ydata'));
+        minx = min(get(h(c),'xdata'));
+        if kp == 28
+            if min(get(h(c),'xdata')) == 0
+                isbad = 1;
+            elseif matr(miny+1,minx) ==1
+                isbad = 1;
+            end
+        end
+        if kp == 29 & min(get(h(c),'xdata')) == fieldwidth-1
+            isbad = 1;
+        elseif matr(miny+1,minx+2) ==1
+            isbad = 1;
+        end
+    end
+    if isbad == 0
+        for c = 1:length(h)
+            set(h(c),'xdata',get(h(c),'xdata')+sign(kp-28.5));
+        end
+        figx = figx+sign(kp-28.5);
+    end
+    kp = 0;
+end
+
+if kp == 32 | kp == 30
+    potfig = rot90(currfig);
+    isbad = 0;
+    if figx+size(potfig,2)>fieldwidth
+        isbad = 1;
+    else
+        for c = 1:size(potfig,1)
+            for d = 1:size(potfig,2)
+                if matr(figy+c,figx+d) == 1;
+                    isbad = 1;
+                end
+            end
+        end
+    end
+    if isbad == 0
+        currfig = potfig;
+        delete(h);
+        h = [];
+        for c = 1:size(currfig,1)
+            for d = 1:size(currfig,2)
+                if currfig(c,d) == 1
+                    h = [h patch([figx+d-1 figx+d figx+d figx+d-1],[figy+c-1 figy+c-1 figy+c figy+c],currcl)];
+                end
+            end
+        end
+    end
+    kp = 0;
+end
+
+if kp == 31
+    %set(gcf,'keypressfcn','%');
+    while 1
+        isbad = 0;
+        for c = 1:length(h)
+            miny = min(get(h(c),'ydata'));
+            minx = min(get(h(c),'xdata'));
+            if min(get(h(c),'ydata')) == 0
+                isbad = 1;
+                break
+            end
+            if matr(miny,minx+1) == 1
+                isbad = 1;
+                break
+            end
+        end
+        if isbad == 1
+            break
+        end
+        for c = 1:length(h)
+            set(h(c),'ydata',get(h(c),'ydata')-1);
+        end
+        figy = figy-1;
+        
+        drawnow
+    end
+    %set(gcf,'keypressfcn','kp = sum(get(gcf,''currentcharacter'')); TetrisKeyPress');
+end

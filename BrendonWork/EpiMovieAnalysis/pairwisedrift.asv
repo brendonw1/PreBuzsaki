@@ -1,0 +1,72 @@
+function [sliceoverlaps]=pairwisedrift(sorted,goodperslice);
+% function [ttoverlaps,ssoverlaps,tsoverlaps,sliceoverlaps]=pairwiseoverlaps(sorted);
+% function [ttoverlaps,ssoverlaps,wwoverlaps,tsoverlaps,twoverlaps,swoverlaps,sliceoverlaps]=pairwiseoverlaps(sorted);
+% function [ttoverlaps,ssoverlaps,tsoverlaps,meanslicerepeat]=findallrepeats(sorted,reshuffsorted);
+
+ttov=[];
+ttdist=[];
+ssov=[];
+ssdist=[];
+% tsov=[];
+% tsdist=[];
+for a=1:size(sorted,2);%for each slice
+    sliceoverlaps(a).tt={};
+    sliceoverlaps(a).ss={};
+    sliceoverlaps(a).ts={};
+    n=size(sorted{a}.ttother,2);
+    if n>=goodperslice;%if there is more than one movie with more than 10 cells coming on from slice "a"
+        for b=1:n;%for each movie
+            for c=b+1:n;%for each not yet compared movie
+                ov=logical(sum(sorted{a}.ttother{b})).*logical(sum(sorted{a}.ttother{c}));
+                ov=sum(ov);
+                denom=min([sum(logical(sum(sorted{a}.ttother{b}))) sum(logical(sum(sorted{a}.ttother{c})))]);
+                sliceoverlaps(a).tt{b,c}=ov/denom;
+                ttov(end+1)=ov/denom;
+                ttdist(end+1)=abs(c-b);
+            end
+        end
+    end
+    n=size(sorted{a}.ssother,2);
+    if n>=goodperslice;%if there is more than one movie with more than 10 cells coming on from slice "a"
+        for b=1:n;%for each movie
+            for c=b+1:n;%for each not yet compared movie
+                ov=logical(sum(sorted{a}.ssother{b})).*logical(sum(sorted{a}.ssother{c}));
+                ov=sum(ov);
+                denom=min([sum(logical(sum(sorted{a}.ssother{b}))) sum(logical(sum(sorted{a}.ssother{c})))]);
+                sliceoverlaps(a).ss{b,c}=ov/denom;
+                ssov(end+1)=ov/denom;
+                ssdist(end+1)=abs(c-b);
+            end
+        end
+    end
+%     n=size(sorted{a}.ttother,2);
+%     m=size(sorted{a}.ssother,2);
+%     if n>=goodperslice;%if there is more than one movie with more than 10 cells coming on from slice "a"
+%         for b=1:n;%for each movie
+%             for c=1:m;%for each not yet compared movie
+%                 ov=logical(sum(sorted{a}.ttother{b})).*logical(sum(sorted{a}.ssother{c}));
+%                 ov=sum(ov);
+%                 denom=min([sum(logical(sum(sorted{a}.ttother{b}))) sum(logical(sum(sorted{a}.ssother{c})))]);
+%                 sliceoverlaps(a).ts{b,c}=ov/denom;
+%             end
+%         end
+%     end
+end    
+
+ttov(find(ttdist>5))=[];
+ttdist(find(ttdist>5))=[];
+p = polyfit(ttdist',ttov',1);
+lin=polyval(p,1:max(ttdist));
+figure;
+hold on
+plot(lin,'r');
+plot(ttdist,ttov,'.')
+
+ssov(find(ssdist>3))=[];
+ssdist(find(ssdist>3))=[];
+p = polyfit(ssdist',ssov',1);
+lin=polyval(p,1:max(ssdist));
+figure;
+hold on
+plot(lin,'r');
+plot(ssdist,ssov,'.')

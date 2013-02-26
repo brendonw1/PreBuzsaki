@@ -1,0 +1,18 @@
+/AR_to_SS.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/README.txt/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/SS_to_AR.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/convert_to_lagged_form.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/ensure_AR.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/eval_AR_perf.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/kalman_filter.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/kalman_forward_backward.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/kalman_smoother.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/kalman_update.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/learn_AR.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/learn_AR_diagonal.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/learn_kalman.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/learning_demo.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/sample_lds.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/smooth_update.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+/tracking_demo.m/1.1.1.1/Wed Dec 15 15:05:41 2004//
+D

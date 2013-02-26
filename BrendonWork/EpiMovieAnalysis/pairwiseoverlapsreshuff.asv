@@ -1,0 +1,142 @@
+function [ttoverlaps,ssoverlaps,tsoverlaps,sliceoverlaps,randomoverlaps,realslicemeans,shuffslicemeans]=pairwiseoverlapsreshuff(sorted,flatshuffsorted);
+% function [ttoverlaps,ssoverlaps,tsoverlaps,meanslicerepeat]=findallrepeats(sorted,flatshuffsorted);
+
+goodperslice=2;
+numreps=1000;
+
+warning off MATLAB:conversionToLogical
+warning off MATLAB:divideByZero
+
+for c=1:size(sorted,2);%for each slice
+    if ~isempty(sorted{c}.tstrain)%j;%if there were tstrain movies for this slice, then...
+        for d=1:size(sorted{c}.tstrain,2)
+            collt{c}(d,:)=sum(sorted{c}.tstrain(d).ons,1);%collapse data from all frames into a single chunk of data
+            collt{c}=logical(collt{c});%a cell that is on in a movie=1 (not more if it is on multiple times)
+            if sum(collt{c}(d,:),2)>=10;%if total number of cells on in this movie is greater than 10:
+                goodt(c,d)=1;%record that this movie was big enough... in this form for easy measuring of size
+            end
+        end
+    end
+    if ~isempty(sorted{c}.spont)%j;%if there were tstrain movies for this slice, then...
+        for d=1:size(sorted{c}.spont,2)
+            colls{c}(d,:)=sum(sorted{c}.spont(d).ons,1);%collapse data from all frames into a single chunk of data
+            colls{c}=logical(colls{c});%a cell that is on in a movie=1 (not more if it is on multiple times)
+            if sum(colls{c}(d,:),2)>=10;%if total number of cells on in this movie is greater than 5:
+                goods(c,d)=1;%record that this movie was big enough... in this form for easy measuring of size
+            end
+        end
+    end
+end
+
+for z=1:numreps;
+    z
+	for a=1:size(sorted,2);%for each slice
+        randomoverlaps(z,a).tt=[];
+        randomoverlaps(z,a).ss=[];
+        randomoverlaps(z,a).ts=[];
+        n=sum(goodt(a,:),2);
+        if n>=goodperslice;%if there is more than one movie with more than 10 cells coming on from slice "a"
+            g=find(goodt(a,:));
+            for b=1:length(g);%for each good movie 
+                for c=b+1:length(g);%for each not yet compared movie
+                    movie1=flatshuffsorted{a}.tstrain(g(b)).ons(1,:,z);
+                    movie2=flatshuffsorted{a}.tstrain(g(c)).ons(1,:,z);
+                    numer=sum(movie1.*movie2);%find best repeats between those two
+                    denom=min([sum(movie1) sum(movie2)]);
+                    randomoverlaps(z,a).tt(end+1)=numer/denom;
+                end
+            end
+        end
+        n=sum(goods(a,:),2);
+        if n>=goodperslice;%if there is more than one movie with more than 10 cells coming on from slice "a"
+            g=find(goods(a,:));
+            for b=1:length(g);%for each good movie 
+                for c=b+1:length(g);%for each not yet compared movie
+                    movie1=flatshuffsorted{a}.spont(g(b)).ons(1,:,z);
+                    movie2=flatshuffsorted{a}.spont(g(c)).ons(1,:,z);
+                    numer=sum(movie1.*movie2);%find best repeats between those two
+                    denom=min([sum(movie1) sum(movie2)]);
+                    randomoverlaps(z,a).ss(end+1)=numer/denom;
+                end
+            end
+        end    
+        if sum(goods(a,:),2)>=1 & sum(goodt(a,:),2)>=1;%if both spont and stim in this slice have at least one good movie
+            gs=find(goods(a,:));
+            gt=find(goodt(a,:));
+            for b=1:length(gt);
+                for c=1:length(gs);
+                    movie1=flatshuffsorted{a}.tstrain(gt(b)).ons(1,:,z);
+                    movie2=flatshuffsorted{a}.spont(gs(c)).ons(1,:,z);
+                    numer=sum(movie1.*movie2);%find best repeats between those two
+                    denom=min([sum(movie1) sum(movie2)]);
+                    randomoverlaps(z,a).ts(end+1)=numer/denom;
+                end
+            end
+        end
+	end
+end
+
+for z=1:numreps;
+    slice=[];
+    for a=1:size(randomoverlaps,2);
+        if~isempty(randomoverlaps(z,a).tt);
+            slice(end+1)=mean(randomoverlaps(z,a).tt);
+        end
+	end
+    shuffslicemeans.tt(z,:)=slice;
+    slice=[];
+    for a=1:size(randomoverlaps,2);
+        if~isempty(randomoverlaps(z,a).ss);
+            slice(end+1)=mean(randomoverlaps(z,a).ss);
+        end
+	end
+    shuffslicemeans.ss(z,:)=slice;
+    slice=[];
+    for a=1:size(randomoverlaps,2);
+        if~isempty(randomoverlaps(z,a).ts);
+            slice(end+1)=mean(randomoverlaps(z,a).ts);
+        end
+	end
+    shuffslicemeans.ts(z,:)=slice;
+end
+
+%%%%%%%%%%
+[sliceoverlaps]=pairwiseoverlaps(sorted);
+realslicemeans.tt=[];
+for a=1:size(sliceoverlaps,2);
+    if~isempty(sliceoverlaps(a).tt);
+        realslicemeans.tt(end+1)=mean(sliceoverlaps(a).tt);
+    end
+end
+realslicemeans.ss=[];
+for a=1:size(sliceoverlaps,2);
+    if~isempty(sliceoverlaps(a).ss);
+        realslicemeans.ss(end+1)=mean(sliceoverlaps(a).ss);
+    end
+end
+realslicemeans.ts=[];
+for a=1:size(sliceoverlaps,2);
+    if~isempty(sliceoverlaps(a).ts);
+        realslicemeans.ts(end+1)=mean(sliceoverlaps(a).ts);
+    end
+end
+
+figure;hist(100*mean(shuffslicemeans.tt,2),100)
+hold on
+plot(100*mean(realslicemeans.tt),1,'*','color','r')
+m=100*mean(mean(shuffslicemeans.tt,2));
+s=100*std(mean(shuffslicemeans.tt,2));
+xlabel('Mean repeatablility of slice means TT comparisons')
+ylabel('Observations');
+title('Distribution in random Trig data sets vs observed (red)')
+legend(['Obs = ',num2str(100*mean(realslicemeans.tt))],['Mean = ',num2str(m),', SD = ',num2str(s)])
+
+figure;hist(100*distpercscore,100)
+hold on
+plot(100*percscore,1,'*','color','r')
+m=100*mean(distpercscore);
+s=100*std(distpercscore);
+xlabel('Percent of active Spont cells that are in cores')
+ylabel('Observations');
+title('Distribution in random Spont data sets vs observed (red)')
+legend(['Obs = ',num2str(100*percscore)],['Mean = ',num2str(m),', SD = ',num2str(s)])

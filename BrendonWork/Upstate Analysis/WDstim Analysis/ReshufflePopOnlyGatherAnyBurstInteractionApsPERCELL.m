@@ -1,0 +1,417 @@
+function results = ReshufflePopOnlyGatherAnyBurstInteractionApsPERCELL(matnotes,stimnum,binwidth,numreshuffs,exclude3,varargin);
+%don't see why to do this by rate, if per cell evaluation... since rate is
+%a cell-wise calculation
+
+warning off
+%% evaluate inputs and setup
+directdesc = '. ';
+distring = ['''tempvar = 1;'''];%default
+for vidx = 1:length(varargin);
+    if strcmp(varargin{vidx},'direct');
+        direct = varargin{vidx+1};
+        switch direct
+            case 1
+                directdesc = ' in DI Cells. ';
+                distring = '[''tempvar = matnotes(sidx).'',cfn,''.DirectInput;'']';
+            case 0
+                directdesc = ' in non-DI Cells. ';
+                distring = '[''tempvar = ~(matnotes(sidx).'',cfn,''.DirectInput);'']';
+        end
+    end
+end
+% 
+% binwidth = 1000;
+beforetime = -4*binwidth;
+aftertime = 6*binwidth;
+% beforetime = -4000;
+% aftertime = 6000;
+% binwidth = 1000;%150ms;
+allwidth = aftertime-beforetime;
+poststimbin = (-beforetime/binwidth)+1;
+
+%below is for counting significance of number of spikes in either first bin
+%or max bin
+stimwidth = 1500;%how long we gave thalamic stims (6 stims: each has 25ms after)
+numcountbins = ceil(stimwidth/binwidth);%how many bins will fit in this stim window
+countbinstarts = 0:binwidth:(binwidth*(numcountbins-1));%start times of bins
+countbinstops = binwidth:binwidth:(binwidth*numcountbins);%stop times of bins
+numfirstbinaps = [];
+nummaxbinaps = [];
+numnegbinaps = [];
+
+numallbins = allwidth/binwidth;
+allbinstarts = beforetime:binwidth:(aftertime-binwidth);
+allbinstops = allbinstarts+binwidth;
+allbinapcounts = zeros(numreshuffs,numallbins);
+
+yallaps = [];
+yevents = [];
+ycellrates = [];
+ycellcounts = [];
+ycelltotalevents = [];
+ycellevents = 0;
+ycellnames = {};
+ycelldi = [];
+firstps = [];
+maxps = [];
+negps = [];
+
+zcellcounts = [];
+zcellrates = [];
+
+% directory = uigetdir;
+
+ONLY3 = 0;
+ycelllatencies = {};
+% stimnum = 1;%which individual stim within the burst is locked to
+
+%% gather data
+
+for sidx = 1:size(matnotes,2);
+%     for cidx = 1:4%go through all cells that had spiking ups
+%         cell = cidx;
+    for cell = 1:4%go through all cells that had spiking ups
+
+%% exclude 2 most active cells
+%        if (sidx == 141 & cell == 2) | (sidx == 159 & cell == 3);
+%            continue
+%        end
+%% exclude 2 cells most active in Spont Stim and 1 cell most active in stim stim 
+        if exclude3;
+            if (sidx == 141 & cell == 2) | (sidx == 159 & cell == 3) | (sidx == 263 & cell == 3);
+               continue
+            end
+        end
+%% exclude 3 most active cells
+%             if (sidx == 141 & cell == 2) | (sidx == 159 & cell == 3) | (sidx == 202 & cell == 1);
+%                 continue
+%             end
+%% only 2 most active cells
+%         if ~(sidx == 141 & cell == 2) & ~(sidx == 159 & cell == 3);
+%             continue
+%         end
+%% only 2 most active cells
+%         ONLY3 = 1;
+%         if ~(sidx == 141 & cell == 2) & ~(sidx == 159 & cell == 3) & ~(sidx == 263 & cell == 3);
+%             continue
+%         end
+%%
+        thiscellhasstiminup = 0;%to allow for later recording data seprarately for cells with stim in ups versus those without
+        cfn = matnotes(sidx).CellOrder.CellFieldNames{cell};%set up to test for direct input or not
+        eval(eval(distring));%eval direct input or not of each cell... makes tempvar for next line
+        if tempvar;%if it passes muster
+%             allbutaps = 0;
+%             cellaps = [];
+%             cellevents = 0;
+
+            yallbutaps = 0;
+            ycellaps = [];
+            ycellevents = 0;
+            ycelllatencies{end+1} = [];
+            
+            for tidx = 1:size(matnotes(sidx).trial,2)%go through each trial
+    %%
+%                 if strcmp(matnotes(sidx).trial(tidx).stim,'wdtrain')%if the trial is 'wdtrain'
+    %%
+                    in6 = matnotes(sidx).trial(tidx).ephys.in6;
+                    if isfield(matnotes(sidx).trial(tidx).ephys,'cell');
+                        interactiontype = matnotes(sidx).trial(tidx).ephys.cell(cell).interactiontype;
+                        if ~isempty(strfind(lower(interactiontype),'burst'))%if a burst interaction
+                            burstnum = str2num(interactiontype(6));
+                            bursts = separatein6(in6,275,'burst');
+                            if ~isempty(bursts);
+                                burstnum = min([size(bursts,2) burstnum]);
+                                aps = matnotes(sidx).trial(tidx).ephys.cell(cell).aps;
+    %                             if ~isempty(aps);
+                                    if length(bursts{burstnum})>=stimnum;
+                                        timeref = bursts{burstnum}(stimnum);
+%% for making sure it's in an official upstate                                                 
+                                        ups = matnotes(sidx).trial(tidx).ephys.cell(cell).upstates;
+                                        stiminup = 0;
+                                        for uidx = 1:size(ups,1);
+                                            if timeref>=ups(uidx,2) & timeref<=ups(uidx,3);
+                                                stiminup = 1;%stim in up used later to record stats specifically 
+                                                thiscellhasstiminup = 1;
+                                                break
+                                            end
+                                        end
+%                                         if stiminup
+%%                                            
+                                            if ~isempty(aps);
+                                                aps = aps-timeref;
+                                                aps(aps < beforetime) = [];
+                                                aps(aps > aftertime) = [];
+                                            end
+                                            if ~isempty(aps);
+%                                                 cellaps = cat(2,cellaps,aps);
+%                                                 allaps =
+%                                                 cat(2,allaps,aps);
+                                                if stiminup%for recording cells that had official up with stim (See mfile cell above)
+                                                    ycellaps = cat(2,ycellaps,aps);
+                                                    yallaps = cat(2,yallaps,aps);
+                                                end
+                                            end
+                                            if isempty(aps);
+                                                allbutaps = 1;
+                                                if stiminup%for recording cells that had official up with stim (See mfile cell above)
+                                                    yallbutaps = 1;
+                                                end
+                                            end
+                                            if ~isempty (matnotes(sidx).trial(tidx).ephys.cell(cell).upstates);
+                                                ups = matnotes(sidx).trial(tidx).ephys.cell(cell).upstates;
+                                                bef = find(ups(:,2)<timeref);
+                                                aft = find(ups(:,3)>timeref);
+                                                befaft = intersect(bef,aft);
+                                                if ~isempty(befaft);
+                                                    upyn = 1;
+                                                end
+                                                whichup = befaft;
+                                            else
+                                                upyn = 0;
+                                            end
+                                            
+%                                             events(end+1,:) = [sidx,tidx,cell,upyn];
+%                                             cellevents = cellevents + 1;
+                                            if stiminup%for recording cells that had official up with stim (See mfile cell above)
+                                                yevents(end+1,:) = [sidx,tidx,cell,upyn,whichup];
+                                                ycellevents = ycellevents + 1;
+                                            end
+%                                             if ONLY3
+%                                                 sortaps = sort(aps);
+%                                                 lidx = min(find(sortaps>0));
+%                                                 ycelllatencies{end}(end+1)=sortaps(lidx);
+%                                             end
+
+%                                         end
+                                    end
+    %                             end
+                            end
+                        end
+                    end
+%                 end
+            end
+%% to record data for cells that had stims
+            if thiscellhasstiminup
+                if yallbutaps
+                    yxs = [1:ceil(allwidth/binwidth)]*binwidth-(binwidth/2);
+                    ycellrates(end+1,:) = zeros(size(yxs));
+                    ycelltotalevents(end+1) = ycellevents(end);
+                    ysln = matnotes(sidx).name(1:end-4);
+                    ycellnames{end+1} = [ysln,' ',cfn];
+                    eval(['ycelldi(end+1) = matnotes(sidx).',cfn,'.DirectInput;'])
+                elseif ~isempty(ycellaps);
+                    ycellaps2 = ycellaps-beforetime;
+
+                    yxs = [1:ceil(allwidth/binwidth)]*binwidth-(binwidth/2);
+                    ynaps = hist(ycellaps2,yxs);
+                    ycellcounts (end+1,:) = ynaps;
+                    ynaps = ynaps*(10000/binwidth);
+                    ycellrates (end+1,:) = ynaps/ycellevents(end);
+                    ycelltotalevents(end+1) = ycellevents(end);
+        %             cfn = matnotes(sidx).CellOrder.CellFieldNames{cell};
+                    ysln = matnotes(sidx).name(1:end-4);
+                    ycellnames{end+1} = [ysln,' ',cfn];
+                    eval(['ycelldi(end+1) = matnotes(sidx).',cfn,'.DirectInput;'])
+                end
+                %for counting aps in the important time bins
+                tempbinaps=[];
+                for bidx = 1:numcountbins;
+                    tempaps = ycellaps(find(ycellaps>countbinstarts(bidx)));
+                    tempaps(tempaps>countbinstops(bidx))=[];
+                    tempbinaps(bidx) = length(tempaps);
+                end
+                numfirstbinaps(end+1) = tempbinaps(1);
+                [trash,thiscellmaxbin] = max(tempbinaps);
+                nummaxbinaps(end+1) = tempbinaps(thiscellmaxbin);
+                negbinaps = ycellaps(find(ycellaps>-binwidth));
+                negbinaps = negbinaps(negbinaps<0);
+                if ~isempty(negbinaps);
+                    1;
+                end
+                numnegbinaps(end+1) = length(negbinaps);
+%% reshuffle aps timerefs from all wd stims from this cell
+                for z = 1:numreshuffs;
+                    zaps = [];
+                    upslist = yevents(find(yevents(:,1)==sidx),:);%list of wd ups for this slice...
+                    upslist = upslist(find(upslist(:,3)==cell),:);%list of wd ups for this cell
+                    for zeidx = 1:size(upslist,1);
+                        zsidx = upslist(zeidx,1);
+                        ztidx = upslist(zeidx,2);
+                        zcell = upslist(zeidx,3);
+                        zup = upslist(zeidx,5);
+                        aps = matnotes(zsidx).trial(ztidx).ephys.cell(zcell).aps;
+                        if ~isempty(aps);
+                            thisup = matnotes(zsidx).trial(ztidx).ephys.cell(zcell).upstates(zup,:);
+
+                            upstart = thisup(2);
+                            upstop = thisup(3);
+%                             timeref = upstart + rand(1)*(upstop-upstart);
+%                             timeref = upstart + rand(1)*10000;
+                            timeref = upstart + rand(1)*min([10000 (upstop-upstart)]);
+                            aps = aps-timeref;
+                            aps(aps < beforetime) = [];
+                            aps(aps > aftertime) = [];
+
+
+                            zaps = cat(2,zaps,aps);%will be all aps counts for each reshuff for this cell
+                            
+                        end
+                    end
+                    
+                    if isempty(zaps);
+    %                 if yallbutaps
+                        if z == 1;    
+                            zcellrates(end+1,:,z) = zeros(size(yxs));%note, use yxs
+                        else
+                            zcellrates(end,:,z) = zeros(size(yxs));%note, use yxs
+                        end                    
+                    elseif ~isempty(zaps);
+                        zcellaps2 = zaps-beforetime;
+                        if z == 1;
+                            znaps = hist(zcellaps2,yxs);
+%                             zcellcounts (end+1,:,z) = znaps;
+                            znaps = znaps*(10000/binwidth);
+                            zcellrates (end+1,:,z) = znaps/ycellevents(end);
+                        else
+                            znaps = hist(zcellaps2,yxs);
+%                             zcellcounts (end,:,z) = znaps;
+                            znaps = znaps*(10000/binwidth);
+                            zcellrates (end,:,z) = znaps/ycellevents(end);
+                        end
+                    end                   
+                    
+                    tempbinaps=[];                    
+                    for bidx = 1:size(allbinstarts,2);
+                        tempaps = zaps(find(zaps>allbinstarts(bidx)));
+                        tempaps(tempaps>allbinstops(bidx))=[];
+                        allbinapcounts(z,bidx) = allbinapcounts(z,bidx) + length(tempaps);
+                    end        
+                    tempbinaps=[];
+                    for bidx = 1:numcountbins;
+                        tempaps = zaps(find(zaps>countbinstarts(bidx)));
+                        tempaps(tempaps>countbinstops(bidx))=[];
+                        tempbinaps(bidx) = length(tempaps);
+                    end
+                    znumfirstbinaps(length(numfirstbinaps),z) = tempbinaps(1);
+%                         [trash,index] = max(tempbinaps);
+%                         znummaxbinaps(length(numfirstbinaps),z) = tempbinaps(index);
+                    znummaxbinaps(length(numfirstbinaps),z) = tempbinaps(thiscellmaxbin);
+                    znegbinaps = zaps(find(zaps>-binwidth));
+                    znegbinaps = znegbinaps(znegbinaps<0);
+                    znumnegbinaps(length(numfirstbinaps),z) = length(znegbinaps);
+                end
+
+            %% for plotting firstbin comparison data for this cell
+                thesereshuffs = znumfirstbinaps(end,:);
+            end
+        end
+    end
+end
+
+
+%% data consolidation for official up stim cells
+ytrialinfo = diff(yevents(:,1:2),1);
+ytrialinfo = ~(ytrialinfo==0);
+ytrialinfo = ytrialinfo(:,1)+ytrialinfo(:,2);
+ytrialinfo = logical([1;ytrialinfo]);
+yalltrials = yevents(ytrialinfo,1:2);
+
+yallslices = unique(yalltrials(:,1));
+
+yallcells = [];
+for sidx = 1:length(yallslices);
+    ythissliceevents = find(yevents(:,1)==yallslices(sidx));
+    ythissliceevents = yevents(ythissliceevents,:);
+    ythisslicecells = unique(ythissliceevents(:,3));
+    for cidx = 1:length(ythisslicecells)
+        yallcells(end+1,:) = [yallslices(sidx) ythisslicecells(cidx)];
+    end
+end
+
+results.yallaps = yallaps;
+results.yevents = yevents;
+results.yallcells = yallcells;
+results.yalltrials = yalltrials;
+results.yallslices = yallslices;
+results.ycellrates = ycellrates;
+results.maxps = maxps;
+results.firstps = firstps;
+
+
+%% for plotting firstbin comparison data for whole population
+% thesereshuffs = sum(znumfirstbinaps,1);
+% thesereshuffs = sort(thesereshuffs);
+% lowsignif = thesereshuffs(round(.05*size(thesereshuffs,2)));
+% highsignif = thesereshuffs(round(.95*size(thesereshuffs,2)))
+% 
+% f = figure;
+% hist(thesereshuffs);
+% hold on
+% plot(sum(numfirstbinaps),0,'*','color','r');
+% p = sum(sum(numfirstbinaps)<=thesereshuffs)/numreshuffs;
+% 
+% teststr = ['#APs in FIRST bin for Population (red *) vs Reshuffles (bars).  ',num2str(binwidth/10),'ms bins.'];
+% cellinfostr = [num2str(size(ycellnames,2)),' total cells.  ', num2str(size(numfirstbinaps,2)),' cells spiking in these trials'];
+% numbersstr = ['Pop: ',num2str(sum(numfirstbinaps)),' spikes in first bin.  ',...
+%     'Reshuffled distribution: mean = ',num2str(mean(thesereshuffs)),', sd = ',num2str(std(thesereshuffs)),'.'];
+% signifstr = ['p = ',num2str(p),'.  ',num2str(numreshuffs),' reshuffles.'];
+% titlestr = {teststr;cellinfostr;numbersstr;signifstr};
+% title(titlestr);
+% 
+% set(f,'userdata',thesereshuffs);
+
+%% generate rate data
+%do per cell... as with real data
+firstbinrates = zcellrates(:,poststimbin,:);%grab first bin rates
+firstbinrates = squeeze(mean(firstbinrates,1));%make n=(numreshuffs) population means
+firstbinrates = sort(firstbinrates);
+lowsignif = firstbinrates(round(.05*size(firstbinrates,1)));
+highsignif = firstbinrates(round(.95*size(firstbinrates,1)));
+p = sum(firstbinrates>mean(ycellrates(:,poststimbin)))/size(firstbinrates,1);
+
+figure;
+hist(firstbinrates)
+hold on;
+plot(mean(ycellrates(:,poststimbin)),0,'*','color','r');
+
+teststr = ['Spike Rate in FIRST bin for Population (red *) vs Reshuffles (bars).  ',num2str(binwidth/10),'ms bins.'];
+cellinfostr = [num2str(size(ycellnames,2)),' total cells.  ', num2str(size(zcellrates,1)),' cells spiking in these trials'];
+numbersstr = ['Pop: ',num2str(mean(ycellrates(:,poststimbin))),' Hz first bin.  ',...
+    'Reshuffled distribution: mean = ',num2str(mean(firstbinrates)),', sd = ',num2str(std(firstbinrates)),'.'];
+signifstr = ['CI = ',num2str(lowsignif),':',num2str(highsignif),'.  p = ',num2str(p),'.  ',num2str(numreshuffs),' reshuffles.'];
+titlestr = {teststr;cellinfostr;numbersstr;signifstr};
+title(titlestr);
+
+
+%% Plot normal PSTH, but with errorbars from the reshuffles
+ymeanrates = mean(ycellrates,1);
+
+f=figure('name','''UP state'' stim');
+errors = std(squeeze(mean(zcellrates,1)),1,2);
+% bar(yxs,ymeanrates,1)
+errorbargraphxvals(yxs,ymeanrates,errors,1);
+ylabel('Avg Firing Rate Per Cell(Hz)')
+xlim([0 allwidth+.5*binwidth]);
+tickwidth = beforetime/-2;
+set(gca,'xtick',[0:tickwidth:allwidth]);
+set(gca,'xticklabel',[(beforetime:tickwidth:aftertime)/10]);
+yl = get(gca,'ylim');
+line([-beforetime -beforetime],[0 yl(2)],'color','r');
+stimtimes = 250*(1-stimnum:1:6-stimnum);
+for stidx = 1:length(stimtimes);
+    line([-beforetime+stimtimes(stidx) -beforetime+stimtimes(stidx)],[0 yl(2)/12],'color','g');
+end
+xlabel('Time relative to stimulus onset')
+results.ydatastr = [num2str(size(yevents,1)),' Events. ',...
+        num2str(size(yallcells,1)),' Cells. '...
+        num2str(size(yalltrials,1)),' Trials. '...
+        num2str(size(yallslices,1)),' Slices. '...
+        num2str(length(find(yevents(:,4)))),' Upstates.'];
+results.yinfostr = ['Spikes timelocked to Stim #',num2str(stimnum),...
+    ' of Burst stimuli during ongoing upstates',directdesc,...
+    num2str(binwidth/10),'ms bins.'];
+% results.ysignifstr = ['Did spiking increase in first bin after stim (Wilcoxon): p=',num2str(yp1),'. Second Bin: p=',num2str(yp2),'.'];
+% ti = {results.ydatastr;results.yinfostr;results.ysignifstr};
+ti = {results.ydatastr;results.yinfostr};
+title(ti)
+set(f,'userdata',results);

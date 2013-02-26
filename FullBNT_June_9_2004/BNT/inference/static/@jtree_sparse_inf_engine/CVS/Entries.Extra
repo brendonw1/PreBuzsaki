@@ -1,0 +1,11 @@
+/cliques_from_engine.m////*///
+/clq_containing_nodes.m////*///
+/collect_evidence.c////*///
+/distribute_evidence.c////*///
+/enter_evidence.m////*///
+/enter_soft_evidence.m////*///
+/init_pot.c////*///
+/jtree_sparse_inf_engine.m////*///
+/marginal_family.m////*///
+/marginal_nodes.m////*///
+/set_fields.m////*///

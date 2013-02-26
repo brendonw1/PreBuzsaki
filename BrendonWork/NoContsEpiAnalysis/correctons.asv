@@ -1,0 +1,18 @@
+function newons=correctons(conts,ons,pixels);
+
+newons=zeros(size(ons));
+figure(10001);
+imagesc(pixels(:,:,1))
+colormap gray
+plotfromcontours(conts);
+for a=1:size(ons,1)-1;
+    picked=cellpicker(conts,find(ons(a,:)));
+    title(['Frame ',num2str(a)])
+    figure(10000);imagesc(pixels(:,:,a)-pixels(:,:,a+1));colormap gray
+	pause
+    picked
+	newons(a,picked)=1;
+end
+% newons(a,picked);
+
+% newons=keepfirstonframe(newons);%keep only beginning of each signal in each cell... don't allow to say a cell was on more than one frame in a row.

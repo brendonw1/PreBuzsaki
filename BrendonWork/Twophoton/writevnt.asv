@@ -1,0 +1,27 @@
+function makevnt(filename,matrix);
+%this will create a targets file for vovan fluoview using a pr 
+
+with the centroids of
+%the specified targets as points, and the ms length, percent power
+%specified
+
+ts=ones(6,(prod(size(cellnumb))+1));%make a matrix to be output, 6 parameters specified for each cell, plus a dummy target at the end
+ts(3,:)=ms;%specify ms duration for each target
+ts(4,:)=percent;%specify ms duration for each target
+ts(:,end)=[0.000;0.000;-1.000;1.000;0.000;1.000];%specifying dummy target parameters
+
+for a=1:length(cellnumb);%for each cell
+    temp=centroid(contours{a});
+    ts(1,a)=temp(1);
+    ts(2,a)=temp(2);
+end
+
+if length(filename)<4;
+    filename=strcat(filename,'.vnt');
+elseif ~strcmp(filename(end-3:end),'.vnt');
+    filename=strcat(filename,'.vnt');
+end
+
+fid=fopen(filename,'w');
+fprintf(fid,'%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f\n',ts);
+fclose(fid);

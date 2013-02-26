@@ -1,0 +1,7 @@
+/bk_ff_fb.m////*///
+/combine_marginals_into_joint.m////*///
+/dbn_to_hmm.m////*///
+/mk_hmm_obs_lik_mat.m////*///
+/mk_hmm_obs_lik_vec.m////*///
+/mk_hmm_obs_lik_vec1.m////*///
+/project_joint_onto_marginals.m////*///

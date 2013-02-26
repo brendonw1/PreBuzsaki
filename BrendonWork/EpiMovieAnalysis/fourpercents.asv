@@ -1,0 +1,13 @@
+function [avgpercentover1,overallpercentover1,avgpercentover2,overallpercentover2,stdpercentover1,stdpercentover2]=fourpercents(nums,dens1,dens2);
+%input is 3 matrices: one for numerators and 2
+
+gooddens1=find(dens1);
+gooddens2=find(dens2);
+
+avgpercentover1=mean(nums(gooddens1)./dens1(gooddens1));
+overallpercentover1=sum(nums(gooddens1))/sum(dens1(gooddens1));
+avgpercentover2=mean(nums(gooddens2)./dens2(gooddens2));
+overallpercentover2=sum(nums(gooddens2))/sum(dens2(gooddens2));
+
+stdpercentover1=std(nums(gooddens1)./dens1(gooddens1));
+stdpercentover2=std(nums(gooddens2)./dens2(gooddens2));

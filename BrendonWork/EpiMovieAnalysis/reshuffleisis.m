@@ -1,0 +1,42 @@
+function newons=reshuffleisis(ons)
+% function [signif5,signif1]=reshuffleisis(ons,window);
+% ons=frames X cells, same w/ new ons
+%finds inter-spike intervals (isis) (in frames) between frames where cells
+%spike.  Then, while keeping the same number of spikes in each cell, and
+%while keeping the same isis for each cell, isi order is shuffled, and the
+%first firing is made an arbitrary distance from the first frame.  For each
+%frame, a total of all spikes in that frame is calculated.  
+%??"This is repeated 1000 times."??
+%we then find the number of cells per frame that are necessary to have a p
+%value of .05 (less than 5% chance of generating that number randomly, by
+%picking out the value of the frame that is at the 95th percentile).  This
+%is called signif5.  signif1 is the value above which p=.01
+%window is the width of the window of frames across which we want to look
+%for significance... so signif5 and signif1 are calculated according the
+%the width of the window of frames to look for cell patterns... sometimes
+%we may want to look for significance in a single frame, window=1, or
+%across 3 frames, window=3;
+warning off MATLAB:conversionToLogical;
+newons=zeros(size(ons));%will be reshuffled version of linear ons 
+for a=1:size(ons,2);%for each cell
+    if sum(ons(:,a))==1;%if only 1 event
+        reshuff=ceil(size(ons,1)*rand); %pick a random new frame in which to have that
+        newons(reshuff,a)=1;%new row for cell a, newisis   
+    elseif sum(ons(:,a))>1;%if cell comes on more than once
+        tempisis=find(ons(:,a));%find frames where cells on
+        tempisis=diff(tempisis);%find inter-spike intervals
+        tempisis=tempisis(randperm(length(tempisis)));%reshuffling isis step
+        firingwidth=sum(tempisis)+1;%number of frames between first and last firing
+        remaining=size(ons,1)-firingwidth;%number of frames before first firing and after last firing
+        if remaining>0;
+            s=ceil((remaining)*rand);%random number btw 0 and the number of frames outside of cell firings
+            tempisis(2:end+1)=tempisis;%making room at beginning of the array
+            tempisis(1)=s;%assigning randomly picked number to be space between begin of movie and 1st firing
+        else
+            tempisis(2:end+1)=tempisis;%making room at beginning of the array
+            tempisis(1)=1;%assigning randomly picked number to be space between begin of movie and 1st firing
+        end
+        tempisis=cumsum(tempisis);%now have frame numbers of "new" (random) firings
+        newons(tempisis,a)=1;%new row for cell a
+    end
+end

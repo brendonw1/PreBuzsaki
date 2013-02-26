@@ -1,0 +1,14 @@
+/CPD_to_lambda_msg.m////*///
+/CPD_to_pi.m////*///
+/CPD_to_scgpot.m////*///
+/README////*///
+/convert_CPD_to_table_hidden_ps.m////*///
+/convert_obs_CPD_to_table.m////*///
+/convert_to_pot.m////*///
+/convert_to_sparse_table.c////*///
+/convert_to_table.m////*///
+/discrete_CPD.m////*///
+/dom_sizes.m////*///
+/log_prob_node.m////*///
+/prob_node.m////*///
+/sample_node.m////*///

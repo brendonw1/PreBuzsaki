@@ -1,0 +1,47 @@
+function handles=ct_InitialCreationPreferences(handles);
+
+
+%% Set spatial and temporal resolution defaults
+Desired_SpatialDefault='1.2';
+Desired_TemporalDefault='1/10';
+
+lidx = get_label_idx(handles, 'resolution');
+set(handles.uigroup{lidx}.inptsr,'string',Desired_SpatialDefault);
+set(handles.uigroup{lidx}.inpttr,'string',Desired_TemporalDefault);
+
+%% set default number of upper,lower,left or right rows of pixels to not
+% filter
+Desired_LeftColumns = 1;
+Desired_RightColumns = 1;
+Desired_UpperRows = 0;
+Desired_LowerRows = 0;
+
+lidx = get_label_idx(handles, 'filterimagebadpixels');      
+set(handles.uigroup{lidx}.leftcols,'String',num2str(Desired_LeftColumns));
+set(handles.uigroup{lidx}.rightcols,'String',num2str(Desired_RightColumns));
+set(handles.uigroup{lidx}.upperrows,'String',num2str(Desired_UpperRows));
+set(handles.uigroup{lidx}.lowerrows,'String',num2str(Desired_LowerRows));
+
+
+%% Set preprocessing defaults;  strings and options must match
+handles.exp.preprocessStrings{1} = 'dfof';
+handles.exp.preprocessStrings{2} = 'halo_subtract';
+handles.exp.preprocessStrings{3} = 'baseline_subtract';
+
+handles.exp.preprocessOptions{1} = feval('ct_dfof_options');
+handles.exp.preprocessOptions{2} = feval('ct_halo_subtract_options');
+handles.exp.preprocessOptions{3} = feval('ct_baseline_subtract_options');
+
+
+%% Setting skipthrough options... ie which dialog boxes and buttons don't
+%need to be pushed.  Generally, a 1 indicates a skip though in a certain
+%place, often with a certain default value for some parameter necessary to
+%be stored too.  0 means no skip.
+%%%%%
+%Below a 1 says user does not have to click the "update" button for halos
+%before clicking next (
+handles.appData.skipThroughSettings.haloUpdate.index = 1;%1 means skipthrough
+%Below: whether the user must click the button to flip the signals or not,
+%and the skipthough answer, if necessary (not used if no skipthough)
+handles.appData.skipThroughSettings.flipSignalQuestion.index = 1;
+handles.appData.skipThroughSettings.flipSignalQuestion.options = 'Yes';%whether to flip signals or not

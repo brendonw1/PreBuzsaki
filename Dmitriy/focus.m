@@ -1,0 +1,58 @@
+function focus(cutoff,areath)
+
+h=input ('file name "focus.tif"?  1 for yes, 0 for no: ');
+
+
+if h==1;
+    figure(1002);
+    b = imread('focus.tif');
+else
+    n = input ('enter name of file, including exptension: ','s');
+    figure(1002);
+    b = imread (n);
+end
+
+
+
+b(:,2)=33000;
+b(:,35)=33000;
+b(:,68)=33000;
+b(:,101)=33000;
+b(:,133)=33000;
+b(:,167)=33000;
+b(:,200)=33000;
+b(:,233)=33000;
+
+
+b(26,:)=33000;
+b(58,:)=33000;
+b(92,:)=33000;
+b(125,:)=33000;
+b(158,:)=33000;
+b(191,:)=33000;
+b(224,:)=33000;
+
+imagesc(b);
+colormap(gray);
+set(gcf,'position',[1, 29, 1024, 672]);
+set(gca,'ydir','reverse');
+axis equal;
+axis off;
+hold on;
+
+yb = imread('lim.tif');
+
+[c h] = contour(yb,[cutoff cutoff],'-r');
+a = {};
+for c = 1:size(h,1);
+   coords = [get(h(c),'xdata')' get(h(c),'ydata')'];
+   if coords(1,:) == coords(end,:);
+      if poly_area(round(coords(1:end-1,:))) > areath;
+         a{size(a,2)+1} = coords(1:end-1,:);
+      else
+         delete(h(c));
+      end
+   else
+      delete(h(c));
+   end
+end

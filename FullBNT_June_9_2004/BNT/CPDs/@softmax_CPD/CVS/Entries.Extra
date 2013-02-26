@@ -1,0 +1,10 @@
+/convert_to_pot.m////*///
+/convert_to_table.m////*///
+/display.m////*///
+/get_field.m////*///
+/maximize_params.m////*///
+/reset_ess.m////*///
+/sample_node.m////*///
+/set_fields.m////*///
+/softmax_CPD.m////*///
+/update_ess.m////*///

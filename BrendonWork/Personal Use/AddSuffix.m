@@ -1,0 +1,1 @@
+function addsuffixdirpath=uigetdir;suff=inputdlg('Enter name of suffix to add... include ''.''');suff=suff{1};d=getdir(dirpath);for a=1:length(d);	movefile([dirpath,'\',d(a).name],[dirpath,'\',d(a).name,suff]);end% for a=10:length(d);% % 	if ~strcmp(d(a).name(end-3),'.');% 		movefile([d(a).name],['0',num2str(9+a),d(a).name(end-3:end)]);% % 	end% end

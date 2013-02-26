@@ -1,0 +1,28 @@
+function masks=contourstomasks(contours,imagesize);
+%this takes Dmitriy-type contours and turns them into a series of lists of
+%pixels in each contour.  The output is a cell array called masks, each
+%array contains a vector of pixel numbers.  imagesize is a length=2 vector containing image 
+%size, info: element1 = size(image,1) and element2 = size(image,2), or
+%imagesize=size(image);
+
+for contnumb = 1:(length(contours));%for each contour
+    temp=zeros(imagesize(1),imagesize(2));%a blank template frame of zeros, for each contour... will be used later to generate a list of pixels
+    max1=max([imagesize(1),...%setting up a box of pixels to look in, so don't look through every pixel in the image
+        ceil(max(contours{contnumb}(:,1)))]);%this is max in dim1, can't be larger than the image in that dimension
+    max2=max([imagesize(2),...
+        ceil(max(contours{contnumb}(:,2)))]);%max value in dim2... can't be larger than the image in that dimension
+    min1=max([1,...
+        floor(min(contours{contnumb}(:,1)))]);%min in dim1, can't be less than 1
+    min2=max([1,...
+        floor(min(contours{contnumb}(:,2)))]);%min in dim2, can't be less than 1
+    
+    v1=repmat(min1:max1,[(max2-min2+1) 1]);
+    v1=reshape(v1,[1 prod(size(v1))]);%a vector of all dim1 coords in bounding box, repeated to match with oppositely indexed dim2 points
+    v2=repmat(min2:max2,[(max1-min1+1) 1])';
+    v2=reshape(v2,[1 prod(size(v2))]);%a vector of all dim2 coords in bounding box
+    
+    in=inpolygon(v1,v2,contours{contnumb}(:,1),contours{contnumb}(:,2));%find out which 
+    in=reshape(in,[max2-min2+1 max1-min1+1]);%reshape into a rectangle, for insertion into the blank template
+    temp(min2:max2,min1:max1)=in;%putting cell pixels in the context of the whole image
+    masks{contnumb}=find(temp);
+end
